@@ -1,0 +1,55 @@
+environment:
+  QT5_VERSION: "v5.12.4"
+
+# windows release build: MinGW-w64 6.3.0 i686 on Windows Server 2012 R2
+image:
+  - Visual Studio 2015
+install:
+  - set QT5_INSTALL_PREFIX="%APPVEYOR_BUILD_FOLDER%\install"
+  - set PATH=C:\msys64\mingw64\bin;%PATH%
+
+before_build:
+  - mingw32-make --version
+  - g++ --version
+  #- dir C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin
+  # download Qt5 sources
+  - git clone https://code.qt.io/qt/qt5.git
+  - cd qt5
+  # checkout desired version
+  - git checkout %QT5_VERSION%
+  # only need qtbase submodule
+  - git submodule update --init qtbase
+  - cd ..
+  # remove git from path to stop cmake complaining about finding sh.exe
+  - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+
+build_script:
+  # build a minimal static version of qtbase & install to %QT5_INSTALL_PREFIX%
+  - mkdir build
+  - cd build
+  - ..\qt5\qtbase\configure -opensource -confirm-license -platform win32-g++ -prefix %QT5_INSTALL_PREFIX% -release -static -static-runtime -silent -sql-sqlite -qt-zlib -qt-libjpeg -qt-libpng -qt-pcre -qt-harfbuzz -no-compile-examples -nomake tests -nomake examples -no-opengl -no-openssl -no-sql-odbc -no-icu -no-feature-concurrent -no-feature-xml -feature-testlib
+  - mingw32-make -j2
+  - mingw32-make install
+  - dir
+  # confirm qmake runs and check version number
+  - '%QT5_INSTALL_PREFIX%\bin\qmake -v'
+
+after_build:
+  - 7z a %APPVEYOR_BUILD_FOLDER%\qt5-static-win32.zip %QT5_INSTALL_PREFIX%
+
+artifacts:
+  - path: qt5-static-win32.zip
+    name: qt5-static-win32
+
+deploy:
+  provider: GitHub
+  description: 'win32 release'
+  artifact: qt5-static-win32
+  auth_token:
+    secure: AzIgTar/Vk7S6hA8HAZAImacEIrbwmfrR6PJ+qHuAQHuLyPSAAcpI5rl/w6BumKp
+  draft: false
+  prerelease: false
+  force_update: true
+  on:
+    branch: master
+    APPVEYOR_REPO_TAG: true

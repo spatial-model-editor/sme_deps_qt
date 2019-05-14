@@ -1,0 +1,58 @@
+language: cpp
+env:
+  global:
+    - QT5_VERSION="v5.12.4"
+      QT5_INSTALL_PREFIX="/usr/local/qt5-static"
+matrix:
+  include:
+    # linux release build: gcc 5.4.0 on ubuntu 16.04
+    - os: linux
+      dist: xenial
+      compiler: gcc
+      # use qt xcb helper libraries on linux (requires libxkbcommon-dev)
+      addons:
+        apt:
+          packages:
+            - libxkbcommon-dev
+      env: QT5_XCB_FLAG="qt-xcb"
+    # osx release build: xcode 9.4.1 [9F2000], macOS 10.13
+    - os: osx
+      osx_image: xcode9.4
+      compiler: clang
+      # explicitly disable xcb on osx build
+      env: QT5_XCB_FLAG="no-xcb"
+before_script:
+  # download Qt5 sources
+  - git clone https://code.qt.io/qt/qt5.git
+  - cd qt5
+  # checkout desired version
+  - git checkout $QT5_VERSION
+  # only need qtbase submodule
+  - git submodule update --init qtbase
+  - cd ../
+script:
+  # build a minimal static version of qtbase & install to $QT5_INSTALL_PREFIX
+  - mkdir build
+  - cd build
+  - ../qt5/qtbase/configure -opensource -confirm-license -prefix $QT5_INSTALL_PREFIX -release -static -silent -$QT5_XCB_FLAG -sql-sqlite -qt-zlib -qt-libjpeg -qt-libpng -qt-pcre -qt-harfbuzz -no-compile-examples -nomake tests -nomake examples -no-opengl -no-openssl -no-sql-odbc -no-icu -no-feature-concurrent -no-feature-xml -feature-testlib
+  - make -j2
+  - sudo make install
+  # confirm qmake runs and check version number
+  - $QT5_INSTALL_PREFIX/bin/qmake -v
+before_deploy:
+  # make tarball of installation
+  tar -zcvf qt5-static-$TRAVIS_OS_NAME.tgz $QT5_INSTALL_PREFIX
+deploy:
+  # if commit was tagged, upload resulting tarball to github release
+  provider: releases
+  api_key:
+    secure: Gw4tK2zPML5+2OM9uNY80rD4dh5a/oC4UbCQAAZoTGjcBvNnrsFUrMi5gUUIE8v8ftlwFUiMfd4+pCL9mBcHMzCmLmvnZ27OlLPDoAfA4/VG1anvz/LLjeSs48INBL6YdqtE+VerjowFEYpx+64YQS/3PlHznSate4H8HX3rNiuSAohiO0QWSuvg5liAHqIljffWFx6kPZ1K31iQsjPVIH/DyehzV32lHVY81exNj6gIOy7VbW5l/6WJendoBepzAAWo2yPjUQ1tfMSh5lTFsPabBDWrKBEZA3Qd3S3D1Flvize8nUcKvLuDXvEwRIaATks222Ep3k3c+GfQYRvzWSI7+pSvwkPntPghOUP9baiedKJDoUiVTIH16bGr5tAPImg+xyvGUCm+wqUk8WXUWX0WYTw+OLM4iyQWtRlrsS6ZLyO5cAu3K4J7S45pSdVnaQsj+R3HiHZLaT4vUiPk+zhHWWBKkxLwn7iXaANriFw7+7bMLjWaAHm8sCru4OFY5BWEhF9iD6Shvvn/rdiP5fzOnJvkWVJ8ql01SATvMWIEvHFA0As/jHnLxNAbB4MPmppT/mTAtA6S/q/3lI4RcIsBLhAC/cRPc3F0hqzopGMsUGwkfQZdDRbhE1cBMszbnIRNmpql1jmHfovG7p2Yub5dpVxSPkBRJUGKpphzw3s=
+  file:
+    - qt5-static-$TRAVIS_OS_NAME.tgz
+  skip_cleanup: true
+  on:
+    repo: lkeegan/qt5-static
+    tags: true
+    all_branches: true
+notifications:
+  email: false
