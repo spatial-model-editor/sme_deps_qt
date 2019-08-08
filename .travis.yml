@@ -5,15 +5,26 @@ env:
       QT5_INSTALL_PREFIX="/usr/local/qt5-static"
 matrix:
   include:
-    # linux release build: gcc 5.4.0 on ubuntu 16.04
+    # linux release build: gcc 9.1.0 on ubuntu 16.04
     - os: linux
       dist: xenial
       compiler: gcc
       # use qt xcb helper libraries on linux (requires libxkbcommon-dev)
       addons:
         apt:
+          sources:
+            - ubuntu-toolchain-r-test
           packages:
+            - g++-9
             - libxkbcommon-dev
+      before_install:
+        # force qt to use desired compiler version
+        - sudo rm /usr/bin/gcc
+        - sudo rm /usr/bin/g++
+        - sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
+        - sudo ln -s /usr/bin/g++-9 /usr/bin/g++
+        - gcc --version
+        - g++ --version
       env: QT5_XCB_FLAG="qt-xcb"
     # osx release build: xcode 9.4.1 [9F2000], macOS 10.13
     - os: osx

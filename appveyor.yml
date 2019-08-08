@@ -1,7 +1,7 @@
 environment:
   QT5_VERSION: "v5.12.4"
 
-# windows release build: MinGW-w64 6.3.0 i686 on Windows Server 2012 R2
+# windows release build: MinGW from msys (currently gcc 9.1.0) on Windows Server 2012 R2
 image:
   - Visual Studio 2015
 install:
@@ -11,7 +11,6 @@ install:
 before_build:
   - mingw32-make --version
   - g++ --version
-  #- dir C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin
   # download Qt5 sources
   - git clone https://code.qt.io/qt/qt5.git
   - cd qt5
