@@ -1,7 +1,7 @@
 language: cpp
 env:
   global:
-    - QT5_VERSION="v5.12.4"
+    - QT5_VERSION="v5.12.5"
       QT5_INSTALL_PREFIX="/usr/local/qt5-static"
 matrix:
   include:

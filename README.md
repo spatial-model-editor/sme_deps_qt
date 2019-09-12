@@ -2,7 +2,7 @@
 
 A minimal static build of Qt5 for [linux](https://github.com/lkeegan/qt5-static/releases/latest/download/qt5-static-linux.tgz) / [osx](https://github.com/lkeegan/qt5-static/releases/latest/download/qt5-static-osx.tgz) / [win32](https://github.com/lkeegan/qt5-static/releases/latest/download/qt5-static-win32.zip)
 
-- Qt version: [Qt 5.12 LTS](https://www.qt.io/qt-5-12) ([5.12.4](https://blog.qt.io/blog/2019/06/17/qt-5-12-4-released-support-openssl-1-1-1/))
+- Qt version: [Qt 5.12 LTS](https://www.qt.io/qt-5-12) ([5.12.5](https://www.qt.io/blog/qt-5.12.5-released))
 - Qt license: [LGPLv3](https://doc.qt.io/qt-5/lgpl.html)
 - see the .yml files for details of exactly what is built and how
 - see https://github.com/lkeegan/spatial-model-editor for an example of use
