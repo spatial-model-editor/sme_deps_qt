@@ -1,5 +1,5 @@
 environment:
-  QT5_VERSION: "v5.13.1"
+  QT5_VERSION: "v5.13.2"
 
 # windows release build: MinGW from msys (currently gcc 9.1.0) on Windows Server 2012 R2
 image:
