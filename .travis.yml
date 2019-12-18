@@ -1,7 +1,7 @@
 language: cpp
 env:
   global:
-    - QT5_VERSION="v5.13.2"
+    - QT5_VERSION="v5.14.0"
       QT5_INSTALL_PREFIX="/usr/local/qt5-static"
 matrix:
   include:
@@ -19,10 +19,8 @@ matrix:
             - libxkbcommon-dev
       before_install:
         # force qt to use desired compiler version
-        - sudo rm /usr/bin/gcc
-        - sudo rm /usr/bin/g++
-        - sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
-        - sudo ln -s /usr/bin/g++-9 /usr/bin/g++
+        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
         - gcc --version
         - g++ --version
       env: QT5_XCB_FLAG="qt-xcb"
