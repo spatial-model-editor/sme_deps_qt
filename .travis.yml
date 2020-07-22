@@ -5,7 +5,7 @@ language: cpp
 env:
   global:
     - QT5_VERSION="v5.15.0"
-    - MSYS_URL='https://github.com/msys2/msys2-installer/releases/download/2020-06-29/msys2-base-x86_64-20200629.sfx.exe'
+    - MSYS_URL='https://github.com/msys2/msys2-installer/releases/download/2020-07-20/msys2-base-x86_64-20200720.sfx.exe'
 
 jobs:
   include:
@@ -82,17 +82,18 @@ jobs:
         # https://www.msys2.org/docs/ci/
         - wget $MSYS_URL -O msys2.exe
         - ./msys2.exe -y -oC:\\
-        - export MSYS_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -msys -lc'
+        - export MSYS_SHELL='cmd //C RefreshEnv.cmd & set MSYS=winsymlinks:nativestrict & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -msys -lc'
         - $MSYS_SHELL ' '
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
-        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-x86_64-gcc git m4 make"
-        - export BUILD_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw64 -l'
+        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-x86_64-gcc git make"
+        - export BUILD_SHELL='cmd //C RefreshEnv.cmd & set MSYS=winsymlinks:nativestrict & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw64 -l'
         - taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+        - taskkill //IM dirmngr.exe //F  # similar to above
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
         - echo 'SUDOCMD=""' >> source.sh
-        - echo 'CONFIGURE_EXTRAS="-platform win32-g++ -static-runtime"' >> source.sh
+        - echo 'CONFIGURE_EXTRAS="-platform win32-g++ -static-runtime -no-zstd"' >> source.sh
         - cat source.sh
     - name: "win32"
       os: windows
@@ -103,17 +104,18 @@ jobs:
         # https://www.msys2.org/docs/ci/
         - wget $MSYS_URL -O msys2.exe
         - ./msys2.exe -y -oC:\\
-        - export MSYS_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -msys -lc'
+        - export MSYS_SHELL='cmd //C RefreshEnv.cmd & set MSYS=winsymlinks:nativestrict & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -msys -lc'
         - $MSYS_SHELL ' '
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
-        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-i686-gcc git m4 make"
-        - export BUILD_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw32 -l'
+        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-i686-gcc git make"
+        - export BUILD_SHELL='cmd //C RefreshEnv.cmd & set MSYS=winsymlinks:nativestrict & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw32 -l'
         - taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+        - taskkill //IM dirmngr.exe //F  # similar to above
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
         - echo 'SUDOCMD=""' >> source.sh
-        - echo 'CONFIGURE_EXTRAS="-platform win32-g++ -static-runtime"' >> source.sh
+        - echo 'CONFIGURE_EXTRAS="-platform win32-g++ -static-runtime -no-zstd"' >> source.sh
         - cat source.sh
 script:
   # download Qt5 sources
