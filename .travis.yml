@@ -4,8 +4,8 @@ dist: xenial
 language: cpp
 env:
   global:
-    - QT5_VERSION="v5.15.0"
-    - MSYS_URL='https://github.com/msys2/msys2-installer/releases/download/2020-07-20/msys2-base-x86_64-20200720.sfx.exe'
+    - QT5_VERSION="v5.15.1"
+    - MSYS_URL='https://github.com/msys2/msys2-installer/releases/download/2020-09-03/msys2-base-x86_64-20200903.sfx.exe'
 
 jobs:
   include:
@@ -88,8 +88,8 @@ jobs:
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
         - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-x86_64-gcc git make"
         - export BUILD_SHELL='cmd //C RefreshEnv.cmd & set MSYS=winsymlinks:nativestrict & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw64 -l'
-        - taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
-        - taskkill //IM dirmngr.exe //F  # similar to above
+        - taskkill //IM gpg-agent.exe //F || echo "task not found" # https://travis-ci.community/t/4967
+        - taskkill //IM dirmngr.exe //F || echo "task not found" # similar to above
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
         - echo 'SUDOCMD=""' >> source.sh
@@ -110,8 +110,8 @@ jobs:
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
         - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-i686-gcc git make"
         - export BUILD_SHELL='cmd //C RefreshEnv.cmd & set MSYS=winsymlinks:nativestrict & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw32 -l'
-        - taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
-        - taskkill //IM dirmngr.exe //F  # similar to above
+        - taskkill //IM gpg-agent.exe //F || echo "task not found" # https://travis-ci.community/t/4967
+        - taskkill //IM dirmngr.exe //F || echo "task not found" # similar to above
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
         - echo 'SUDOCMD=""' >> source.sh
