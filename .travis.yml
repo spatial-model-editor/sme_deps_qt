@@ -2,6 +2,9 @@ version: ~> 1.0
 os: linux
 dist: xenial
 language: cpp
+cache:
+  directories:
+    - qt
 env:
   global:
     - QT5_VERSION="v5.15.1"
@@ -14,9 +17,9 @@ jobs:
       dist: xenial
       compiler: gcc
       env:
-        - INSTALL_PREFIX="/opt/libs"
+        - INSTALL_PREFIX="/opt/smelibs"
         - BUILD_SHELL='bash'
-        - SUDOCMD='sudo'
+        - SUDO_CMD='sudo'
       addons:
         apt:
           sources:
@@ -56,28 +59,33 @@ jobs:
         - g++ --version
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
-        - echo "SUDOCMD=$SUDOCMD" >> source.sh
+        - echo "SUDO_CMD=$SUDO_CMD" >> source.sh
         - echo 'CONFIGURE_EXTRAS="-xcb"' >> source.sh
+        - echo "QT5_VERSION=$QT5_VERSION" >> source.sh
         - cat source.sh
     - name: "osx"
       os: osx
       osx_image: xcode11.3
       compiler: clang
       env:
-        - INSTALL_PREFIX="/opt/libs"
+        - INSTALL_PREFIX="/opt/smelibs"
         - BUILD_SHELL='bash'
-        - SUDOCMD='sudo'
+        - SUDO_CMD='sudo'
         - MACOSX_DEPLOYMENT_TARGET=10.14
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
-        - echo "SUDOCMD=$SUDOCMD" >> source.sh
+        - echo "SUDO_CMD=$SUDO_CMD" >> source.sh
         - echo 'CONFIGURE_EXTRAS="-bundled-xcb-xinput"' >> source.sh
+        - echo "QT5_VERSION=$QT5_VERSION" >> source.sh
         - cat source.sh
     - name: "win64"
       os: windows
       env:
-        - INSTALL_PREFIX="/c/libs"
-        - SUDOCMD=''
+        - INSTALL_PREFIX="/c/smelibs"
+        - SUDO_CMD=''
+        # this environment variable is here to ensure the two windows builds don't share the same cache
+        # see https://docs.travis-ci.com/user/caching#caches-and-build-matrices
+        - ARCH='x86_64'
       install:
         # https://www.msys2.org/docs/ci/
         - wget $MSYS_URL -O msys2.exe
@@ -92,14 +100,16 @@ jobs:
         - taskkill //IM dirmngr.exe //F || echo "task not found" # similar to above
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
-        - echo 'SUDOCMD=""' >> source.sh
+        - echo 'SUDO_CMD=""' >> source.sh
         - echo 'CONFIGURE_EXTRAS="-platform win32-g++ -static-runtime -no-zstd"' >> source.sh
+        - echo "QT5_VERSION=$QT5_VERSION" >> source.sh
         - cat source.sh
     - name: "win32"
       os: windows
       env:
-        - INSTALL_PREFIX="/c/libs"
-        - SUDOCMD=''
+        - INSTALL_PREFIX="/c/smelibs"
+        - SUDO_CMD=''
+        - ARCH='i686'
       install:
         # https://www.msys2.org/docs/ci/
         - wget $MSYS_URL -O msys2.exe
@@ -114,36 +124,37 @@ jobs:
         - taskkill //IM dirmngr.exe //F || echo "task not found" # similar to above
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
-        - echo 'SUDOCMD=""' >> source.sh
+        - echo 'SUDO_CMD=""' >> source.sh
         - echo 'CONFIGURE_EXTRAS="-platform win32-g++ -static-runtime -no-zstd"' >> source.sh
+        - echo "QT5_VERSION=$QT5_VERSION" >> source.sh
         - cat source.sh
 script:
-  # download Qt5 sources
-  - git clone https://code.qt.io/qt/qt5.git
-  - cd qt5
-  # checkout desired version
-  - git checkout $QT5_VERSION
-  # only need qtbase submodule
-  - git submodule update --init qtbase
-  - cd ../
-  # build & install a minimal static version of qtbase
-  - $BUILD_SHELL build.sh
+  # if setup has not already been done, run it
+  - if [ ! -f qt/SETUP_COMPLETE ]; then $BUILD_SHELL setup.sh ; fi
+  # osx doesn't have timeout function, using this instead: https://gist.github.com/jaytaylor/6527607
+  - function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
+  # run the build for at most 25mins=1500s (50min limit on travis job)
+  - $BUILD_SHELL -c "timeout 1500 bash continue.sh"
+  # if the build didn't finish in time
+  #  - the above line exits with an error code
+  #  - the directory `qt` in cache is updated with the current contents
+  #  - travis job can be manually restarted: will continue build using the cached files
   # confirm qmake runs and check version number
   - $INSTALL_PREFIX/bin/qmake -v
 before_deploy:
   # make tarball of installation
-  tar -zcvf qt5-static-$TRAVIS_JOB_NAME.tgz $INSTALL_PREFIX/*
+  tar -zcvf sme_deps_qt5_$TRAVIS_JOB_NAME.tgz $INSTALL_PREFIX/*
 deploy:
   # if commit was tagged, upload resulting tarball to github release
+  edge: true
   provider: releases
   token:
     secure: Gw4tK2zPML5+2OM9uNY80rD4dh5a/oC4UbCQAAZoTGjcBvNnrsFUrMi5gUUIE8v8ftlwFUiMfd4+pCL9mBcHMzCmLmvnZ27OlLPDoAfA4/VG1anvz/LLjeSs48INBL6YdqtE+VerjowFEYpx+64YQS/3PlHznSate4H8HX3rNiuSAohiO0QWSuvg5liAHqIljffWFx6kPZ1K31iQsjPVIH/DyehzV32lHVY81exNj6gIOy7VbW5l/6WJendoBepzAAWo2yPjUQ1tfMSh5lTFsPabBDWrKBEZA3Qd3S3D1Flvize8nUcKvLuDXvEwRIaATks222Ep3k3c+GfQYRvzWSI7+pSvwkPntPghOUP9baiedKJDoUiVTIH16bGr5tAPImg+xyvGUCm+wqUk8WXUWX0WYTw+OLM4iyQWtRlrsS6ZLyO5cAu3K4J7S45pSdVnaQsj+R3HiHZLaT4vUiPk+zhHWWBKkxLwn7iXaANriFw7+7bMLjWaAHm8sCru4OFY5BWEhF9iD6Shvvn/rdiP5fzOnJvkWVJ8ql01SATvMWIEvHFA0As/jHnLxNAbB4MPmppT/mTAtA6S/q/3lI4RcIsBLhAC/cRPc3F0hqzopGMsUGwkfQZdDRbhE1cBMszbnIRNmpql1jmHfovG7p2Yub5dpVxSPkBRJUGKpphzw3s=
   file:
-    - qt5-static-$TRAVIS_JOB_NAME.tgz
+    - sme_deps_qt5_$TRAVIS_JOB_NAME.tgz
   cleanup: false
-  edge: true
   on:
-    repo: lkeegan/qt5-static
+    repo: spatial-model-editor/sme_deps_qt5
     tags: true
     all_branches: true
 notifications:
