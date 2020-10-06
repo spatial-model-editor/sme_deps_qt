@@ -1,0 +1,121 @@
+name: Release Builds
+
+on: [push, create]
+
+env:
+  QT5_VERSION: 'v5.15.1'
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-16.04
+    env:
+      INSTALL_PREFIX: '/opt/smelibs'
+      SUDO_CMD: 'sudo'
+      CONFIGURE_EXTRAS: '-xcb -bundled-xcb-xinput'
+      OS: 'linux'
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Install Qt build dependencies
+      run: |
+        sudo apt update -yy
+        sudo apt install -yy libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev libxcb-xinerama0-dev
+    - name: Set gcc version
+      run: |
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+    - uses: actions/checkout@v2
+    - name: Build script
+      run: ./build.sh
+    - uses: actions/upload-artifact@v2
+      with:
+        path: ./artefacts/*
+
+  macos:
+    name: MacOS
+    runs-on: macos-10.15
+    env:
+      INSTALL_PREFIX: '/opt/smelibs'
+      SUDO_CMD: 'sudo'
+      MACOSX_DEPLOYMENT_TARGET: '10.14'
+      CONFIGURE_EXTRAS: '-bundled-xcb-xinput'
+      OS: 'osx'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build script
+        run: ./build.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
+  win64:
+    name: Windows 64-bit
+    runs-on: windows-2019
+    env:
+      INSTALL_PREFIX: '/c/smelibs'
+      SUDO_CMD: ''
+      CONFIGURE_EXTRAS: '-platform win32-g++ -static-runtime -no-zstd'
+      OS: 'win64'
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: mingw-w64-x86_64-gcc make git
+      - name: Build script
+        run: ./build.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
+  win32:
+    name: Windows 32-bit
+    runs-on: windows-2019
+    env:
+      INSTALL_PREFIX: '/c/smelibs'
+      SUDO_CMD: ''
+      CONFIGURE_EXTRAS: '-platform win32-g++ -static-runtime -no-zstd'
+      OS: 'win32'
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: true
+          install: mingw-w64-i686-gcc make git
+      - name: Build script
+        run: ./build.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
+  release:
+    needs: [linux, macos, win64, win32]
+    runs-on: ubuntu-18.04
+    # upload binaries to github release if commit is tagged
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: binaries
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: binaries/*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
