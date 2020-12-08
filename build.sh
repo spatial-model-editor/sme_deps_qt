@@ -10,9 +10,6 @@ echo "OS=$OS"
 echo "PATH=$PATH"
 which g++
 g++ --version
-which make
-make --version
-
 # make qt dir
 mkdir qt
 cd qt
@@ -25,14 +22,13 @@ git checkout $QT5_VERSION
 git submodule update --init qtbase
 cd ..
 
-# make build dir in qt/build and run configure
+# make build dir in qt/build and run cmake
 mkdir build
 cd build
-../qt5/qtbase/configure -opensource -confirm-license ${CONFIGURE_EXTRAS} -prefix ${INSTALL_PREFIX} -release -static -silent -sql-sqlite -qt-zlib -qt-libjpeg -qt-libpng -qt-pcre -qt-harfbuzz -no-compile-examples -nomake tests -nomake examples -no-opengl -no-openssl -no-sql-odbc -no-icu -no-feature-concurrent -no-feature-xml -feature-testlib
-cat config.log
+cmake ../qt5/qtbase -G "Ninja" -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} -DQT_USE_BUNDLED_BundledFreetype=ON -DQT_USE_BUNDLED_BundledHarfbuzz=ON -DQT_USE_BUNDLED_BundledLibpng=ON -DQT_USE_BUNDLED_BundledPcre2=ON -DFEATURE_system_doubleconversion=OFF -DFEATURE_system_freetype=OFF -DFEATURE_system_harfbuzz=OFF -DFEATURE_system_jpeg=OFF -DFEATURE_system_libb2=OFF -DFEATURE_system_pcre2=OFF -DFEATURE_system_png=OFF -DFEATURE_system_proxies=OFF -DFEATURE_system_sqlite=OFF -DFEATURE_system_textmarkdownreader=OFF -DFEATURE_system_zlib=OFF -DFEATURE_zstd=OFF -DFEATURE_openssl=OFF -DFEATURE_sql=OFF -DFEATURE_icu=OFF -DFEATURE_testlib=ON -DBUILD_WITH_PCH=OFF ${CONFIGURE_EXTRAS}
 
-time make -j2
-$SUDO_CMD make install
+time ninja
+$SUDO_CMD ninja install
 
 cd ../..
 

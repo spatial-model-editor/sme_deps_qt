@@ -3,16 +3,17 @@ name: Release Builds
 on: push
 
 env:
-  QT5_VERSION: 'v5.15.2'
+  QT5_VERSION: 'v6.1.0'
 
 jobs:
   linux:
     name: Linux
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
+    # bumped ubuntu version to get libxcb>=1.13 https://bugreports.qt.io/browse/QTBUG-85989
     env:
       INSTALL_PREFIX: '/opt/smelibs'
       SUDO_CMD: 'sudo'
-      CONFIGURE_EXTRAS: '-xcb -bundled-xcb-xinput'
+      CONFIGURE_EXTRAS: '-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF'
       OS: 'linux'
     defaults:
       run:
@@ -21,7 +22,7 @@ jobs:
     - name: Install Qt build dependencies
       run: |
         sudo apt update -yy
-        sudo apt install -yy libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev libxcb-xinerama0-dev libxcb-util-dev
+        sudo apt install -yy libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
     - name: Set gcc version
       run: |
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
@@ -40,12 +41,14 @@ jobs:
       INSTALL_PREFIX: '/opt/smelibs'
       SUDO_CMD: 'sudo'
       MACOSX_DEPLOYMENT_TARGET: '10.14'
-      CONFIGURE_EXTRAS: '-bundled-xcb-xinput'
+      CONFIGURE_EXTRAS: ''
       OS: 'osx'
     defaults:
       run:
         shell: bash
     steps:
+      - name: Brew install ninja
+        run: brew install ninja
       - uses: actions/checkout@v2
       - name: Build script
         run: ./build.sh
@@ -59,7 +62,7 @@ jobs:
     env:
       INSTALL_PREFIX: '/c/smelibs'
       SUDO_CMD: ''
-      CONFIGURE_EXTRAS: '-platform win32-g++ -static-runtime -no-zstd'
+      CONFIGURE_EXTRAS: '-DQT_QMAKE_TARGET_MKSPEC=win32-g++'
       OS: 'win64'
     defaults:
       run:
@@ -70,7 +73,7 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: mingw-w64-x86_64-gcc make git
+          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja git
       - name: Build script
         run: ./build.sh
       - uses: actions/upload-artifact@v2
@@ -83,7 +86,7 @@ jobs:
     env:
       INSTALL_PREFIX: '/c/smelibs'
       SUDO_CMD: ''
-      CONFIGURE_EXTRAS: '-platform win32-g++ -static-runtime -no-zstd'
+      CONFIGURE_EXTRAS: '-DQT_QMAKE_TARGET_MKSPEC=win32-g++'
       OS: 'win32'
     defaults:
       run:
@@ -94,7 +97,7 @@ jobs:
         with:
           msystem: MINGW32
           update: true
-          install: mingw-w64-i686-gcc make git
+          install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-ninja git
       - name: Build script
         run: ./build.sh
       - uses: actions/upload-artifact@v2
