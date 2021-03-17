@@ -1,8 +1,8 @@
-# sme_deps_qt5 ![Release Builds](https://github.com/spatial-model-editor/sme_deps_qt5/workflows/Release%20Builds/badge.svg)
+# sme_deps_qt5 [![Release Builds](https://github.com/spatial-model-editor/sme_deps_qt5/actions/workflows/release.yml/badge.svg)](https://github.com/spatial-model-editor/sme_deps_qt5/actions/workflows/release.yml)
 
 A minimal static build of Qt5:
 
-- Qt version: [Qt 5.15.1](https://doc.qt.io/qt-5/)
+- Qt version: [Qt 5.15.2](https://doc.qt.io/qt-5/)
 - Qt license: [LGPLv3](https://doc.qt.io/qt-5/lgpl.html)
 
 Get the latest versions here:
