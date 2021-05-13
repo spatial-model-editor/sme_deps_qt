@@ -13,7 +13,8 @@ jobs:
     env:
       INSTALL_PREFIX: '/opt/smelibs'
       SUDO_CMD: 'sudo'
-      CONFIGURE_EXTRAS: '-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF'
+      # legacy opengl option prevents qt from depending on libOpenGL: https://bugreports.qt.io/browse/QTBUG-89754
+      CONFIGURE_EXTRAS: '-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF -DOpenGL_GL_PREFERENCE=LEGACY'
       OS: 'linux'
     defaults:
       run:
