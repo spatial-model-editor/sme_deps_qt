@@ -3,7 +3,7 @@ name: Release Builds
 on: push
 
 env:
-  QT5_VERSION: 'v6.1.0'
+  QT_VERSION: 'v6.1.0'
 
 jobs:
   linux:
