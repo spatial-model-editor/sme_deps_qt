@@ -57,14 +57,14 @@ jobs:
         with:
           path: ./artefacts/*
 
-  win64:
-    name: Windows 64-bit
+  win64-mingw:
+    name: Windows 64-bit Mingw
     runs-on: windows-2019
     env:
       INSTALL_PREFIX: '/c/smelibs'
       SUDO_CMD: ''
       CONFIGURE_EXTRAS: '-DQT_QMAKE_TARGET_MKSPEC=win32-g++'
-      OS: 'win64'
+      OS: 'win64-mingw'
     defaults:
       run:
         shell: msys2 {0}
@@ -81,14 +81,14 @@ jobs:
         with:
           path: ./artefacts/*
 
-  win32:
-    name: Windows 32-bit
+  win32-mingw:
+    name: Windows 32-bit Mingw
     runs-on: windows-2019
     env:
       INSTALL_PREFIX: '/c/smelibs'
       SUDO_CMD: ''
       CONFIGURE_EXTRAS: '-DQT_QMAKE_TARGET_MKSPEC=win32-g++'
-      OS: 'win32'
+      OS: 'win32-mingw'
     defaults:
       run:
         shell: msys2 {0}
@@ -105,9 +105,45 @@ jobs:
         with:
           path: ./artefacts/*
 
+  win64-msvc:
+    name: Windows 64-bit MSVC
+    runs-on: windows-2019
+    env:
+      INSTALL_PREFIX: 'C:\smelibs'
+      OS: 'win64-msvc'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64
+          toolset: 14.0
+      - name: Build script
+        run: ./build.ps1
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
+  win32-msvc:
+    name: Windows 32-bit MSVC
+    runs-on: windows-2019
+    env:
+      INSTALL_PREFIX: 'C:\smelibs'
+      OS: 'win32-msvc'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_x86
+          toolset: 14.0
+      - name: Build script
+        run: ./build.ps1
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
   release:
-    needs: [linux, macos, win64, win32]
-    runs-on: ubuntu-18.04
+    needs: [linux, macos, win64-mingw, win32-mingw, win64-msvc, win32-msvc]
+    runs-on: ubuntu-20.04
     # upload binaries to github release if commit is tagged
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
     steps:
