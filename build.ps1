@@ -55,5 +55,5 @@ cd ..\..
 mkdir artefacts
 cd artefacts
 7z a tmp.tar $env:INSTALL_PREFIX
-7z a sme_deps_llvm_$env:OS.tgz tmp.tar
+7z a sme_deps_qt_$env:OS.tgz tmp.tar
 rm tmp.tar
