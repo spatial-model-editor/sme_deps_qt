@@ -26,25 +26,25 @@ cd ..
 mkdir build
 cd build
 cmake ../qt5/qtbase -G "Ninja" \
-  -DBUILD_SHARED_LIBS=OFF \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
-  -DFEATURE_system_doubleconversion=OFF \
-  -DFEATURE_system_harfbuzz=OFF \
-  -DFEATURE_system_jpeg=OFF \
-  -DFEATURE_system_libb2=OFF \
-  -DFEATURE_system_pcre2=OFF \
-  -DFEATURE_system_png=OFF \
-  -DFEATURE_system_proxies=OFF \
-  -DFEATURE_system_textmarkdownreader=OFF \
-  -DFEATURE_system_zlib=OFF \
-  -DFEATURE_zstd=OFF \
-  -DFEATURE_openssl=OFF \
-  -DFEATURE_sql=OFF \
-  -DFEATURE_icu=OFF \
-  -DFEATURE_testlib=ON \
-  -DBUILD_WITH_PCH=OFF \
-  ${CONFIGURE_EXTRAS}
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
+    -DFEATURE_system_doubleconversion=OFF \
+    -DFEATURE_system_harfbuzz=OFF \
+    -DFEATURE_system_jpeg=OFF \
+    -DFEATURE_system_libb2=OFF \
+    -DFEATURE_system_pcre2=OFF \
+    -DFEATURE_system_png=OFF \
+    -DFEATURE_system_proxies=OFF \
+    -DFEATURE_system_textmarkdownreader=OFF \
+    -DFEATURE_system_zlib=OFF \
+    -DFEATURE_zstd=OFF \
+    -DFEATURE_openssl=OFF \
+    -DFEATURE_sql=OFF \
+    -DFEATURE_icu=OFF \
+    -DFEATURE_testlib=ON \
+    -DBUILD_WITH_PCH=OFF \
+    ${CONFIGURE_EXTRAS}
 
 time ninja
 $SUDO_CMD ninja install

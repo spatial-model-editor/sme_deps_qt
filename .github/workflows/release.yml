@@ -3,7 +3,7 @@ name: Release Builds
 on: push
 
 env:
-  QT_VERSION: 'v6.2.0'
+  QT_VERSION: "v6.2.0"
 
 jobs:
   linux:
@@ -11,39 +11,39 @@ jobs:
     runs-on: ubuntu-18.04
     # bumped ubuntu version to get libxcb>=1.13 https://bugreports.qt.io/browse/QTBUG-85989
     env:
-      INSTALL_PREFIX: '/opt/smelibs'
-      SUDO_CMD: 'sudo'
+      INSTALL_PREFIX: "/opt/smelibs"
+      SUDO_CMD: "sudo"
       # legacy opengl option prevents qt from depending on libOpenGL: https://bugreports.qt.io/browse/QTBUG-89754
-      CONFIGURE_EXTRAS: '-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF -DOpenGL_GL_PREFERENCE=LEGACY'
-      OS: 'linux'
+      CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF -DOpenGL_GL_PREFERENCE=LEGACY"
+      OS: "linux"
     defaults:
       run:
         shell: bash
     steps:
-    - name: Install Qt build dependencies
-      run: |
-        sudo apt update -yy
-        sudo apt install -yy libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
-    - name: Set gcc version
-      run: |
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
-    - uses: actions/checkout@v2
-    - name: Build script
-      run: ./build.sh
-    - uses: actions/upload-artifact@v2
-      with:
-        path: ./artefacts/*
+      - name: Install Qt build dependencies
+        run: |
+          sudo apt update -yy
+          sudo apt install -yy libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
+      - name: Set gcc version
+        run: |
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+      - uses: actions/checkout@v2
+      - name: Build script
+        run: ./build.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
 
   macos:
     name: MacOS
     runs-on: macos-10.15
     env:
-      INSTALL_PREFIX: '/opt/smelibs'
-      SUDO_CMD: 'sudo'
-      MACOSX_DEPLOYMENT_TARGET: '10.14'
-      CONFIGURE_EXTRAS: ''
-      OS: 'osx'
+      INSTALL_PREFIX: "/opt/smelibs"
+      SUDO_CMD: "sudo"
+      MACOSX_DEPLOYMENT_TARGET: "10.14"
+      CONFIGURE_EXTRAS: ""
+      OS: "osx"
     defaults:
       run:
         shell: bash
@@ -61,10 +61,10 @@ jobs:
     name: Windows 64-bit Mingw
     runs-on: windows-2019
     env:
-      INSTALL_PREFIX: '/c/smelibs'
-      SUDO_CMD: ''
-      CONFIGURE_EXTRAS: '-DQT_QMAKE_TARGET_MKSPEC=win32-g++'
-      OS: 'win64-mingw'
+      INSTALL_PREFIX: "/c/smelibs"
+      SUDO_CMD: ""
+      CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
+      OS: "win64-mingw"
     defaults:
       run:
         shell: msys2 {0}
@@ -85,10 +85,10 @@ jobs:
     name: Windows 32-bit Mingw
     runs-on: windows-2019
     env:
-      INSTALL_PREFIX: '/c/smelibs'
-      SUDO_CMD: ''
-      CONFIGURE_EXTRAS: '-DQT_QMAKE_TARGET_MKSPEC=win32-g++'
-      OS: 'win32-mingw'
+      INSTALL_PREFIX: "/c/smelibs"
+      SUDO_CMD: ""
+      CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
+      OS: "win32-mingw"
     defaults:
       run:
         shell: msys2 {0}
@@ -110,7 +110,7 @@ jobs:
     runs-on: windows-2019
     env:
       INSTALL_PREFIX: 'C:\smelibs'
-      OS: 'win64-msvc'
+      OS: "win64-msvc"
     steps:
       - uses: actions/checkout@v2
       - uses: ilammy/msvc-dev-cmd@v1
@@ -128,7 +128,7 @@ jobs:
     runs-on: windows-2019
     env:
       INSTALL_PREFIX: 'C:\smelibs'
-      OS: 'win32-msvc'
+      OS: "win32-msvc"
     steps:
       - uses: actions/checkout@v2
       - uses: ilammy/msvc-dev-cmd@v1
