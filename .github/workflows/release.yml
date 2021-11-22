@@ -26,8 +26,8 @@ jobs:
           sudo apt install -yy libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
       - name: Set gcc version
         run: |
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
       - uses: actions/checkout@v2
       - name: Build script
         run: ./build.sh
@@ -37,7 +37,7 @@ jobs:
 
   macos:
     name: MacOS
-    runs-on: macos-10.15
+    runs-on: macos-11
     env:
       INSTALL_PREFIX: "/opt/smelibs"
       SUDO_CMD: "sudo"
