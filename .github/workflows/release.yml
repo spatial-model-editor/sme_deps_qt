@@ -16,18 +16,26 @@ jobs:
       # legacy opengl option prevents qt from depending on libOpenGL: https://bugreports.qt.io/browse/QTBUG-89754
       CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF -DOpenGL_GL_PREFERENCE=LEGACY"
       OS: "linux"
+      CC: "clang"
+      CXX: "clang++"
     defaults:
       run:
         shell: bash
     steps:
+      - name: Add llvm repo for clang 13
+        run: |
+          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-13 main"
       - name: Install Qt build dependencies
         run: |
           sudo apt update -yy
-          sudo apt install -yy libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
-      - name: Set gcc version
+          sudo apt install -yy clang-13 libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
+      - name: Set clang version
         run: |
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+          sudo update-alternatives --remove-all clang || echo "nothing to remove"
+          sudo update-alternatives --remove-all clang++ || echo "nothing to remove"
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-13 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-13 100
       - uses: actions/checkout@v2
       - name: Build script
         run: ./build.sh
