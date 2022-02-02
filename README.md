@@ -2,7 +2,7 @@
 
 A minimal static build of Qt:
 
-- Qt version: [Qt 6.2.0](https://doc.qt.io/qt-6/)
+- Qt version: [Qt 6.2.3](https://doc.qt.io/qt-6/)
 - Qt license: [LGPLv3](https://doc.qt.io/qt-6/lgpl.html)
 
 Get the latest versions here:
