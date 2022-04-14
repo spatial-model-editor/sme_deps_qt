@@ -3,7 +3,7 @@ name: Release Builds
 on: push
 
 env:
-  QT_VERSION: "v6.2.3"
+  QT_VERSION: "v6.3.0"
 
 jobs:
   linux:
@@ -22,30 +22,30 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Add llvm repo for clang 13
+      - name: Add llvm repo for clang 14
         run: |
           sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-13 main"
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-14 main"
       - name: Install Qt build dependencies
         run: |
           sudo apt update -yy
-          sudo apt install -yy clang-13 libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
+          sudo apt install -yy clang-14 libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
       - name: Set clang version
         run: |
           sudo update-alternatives --remove-all clang || echo "nothing to remove"
           sudo update-alternatives --remove-all clang++ || echo "nothing to remove"
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-13 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-13 100
-      - uses: actions/checkout@v2
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-14 100
+      - uses: actions/checkout@v3
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   macos:
     name: MacOS
-    runs-on: macos-10.15
+    runs-on: macos-11
     env:
       INSTALL_PREFIX: "/opt/smelibs"
       SUDO_CMD: "sudo"
@@ -58,16 +58,16 @@ jobs:
     steps:
       - name: Brew install ninja
         run: brew install ninja
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   win64-mingw:
     name: Windows 64-bit Mingw
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       INSTALL_PREFIX: "/c/smelibs"
       SUDO_CMD: ""
@@ -77,7 +77,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
@@ -85,13 +85,13 @@ jobs:
           install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja git
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   win32-mingw:
     name: Windows 32-bit Mingw
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       INSTALL_PREFIX: "/c/smelibs"
       SUDO_CMD: ""
@@ -101,7 +101,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW32
@@ -109,43 +109,43 @@ jobs:
           install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-ninja git
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   win64-msvc:
     name: Windows 64-bit MSVC
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       INSTALL_PREFIX: 'C:\smelibs'
       OS: "win64-msvc"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: amd64
           toolset: 14.0
       - name: Build script
         run: ./build.ps1
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   win32-msvc:
     name: Windows 32-bit MSVC
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       INSTALL_PREFIX: 'C:\smelibs'
       OS: "win32-msvc"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: amd64_x86
           toolset: 14.0
       - name: Build script
         run: ./build.ps1
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
@@ -155,7 +155,7 @@ jobs:
     # upload binaries to github release if commit is tagged
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: artifact
           path: binaries
