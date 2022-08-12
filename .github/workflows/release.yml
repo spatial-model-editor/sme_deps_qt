@@ -4,6 +4,7 @@ on: push
 
 env:
   QT_VERSION: "v6.3.1"
+  ZLIB_VERSION: "v1.2.12" # not used for msvc builds
 
 jobs:
   linux:
