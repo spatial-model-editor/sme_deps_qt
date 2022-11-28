@@ -55,6 +55,7 @@ cmake ../qt5/qtbase -G "Ninja" \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
+    -DCMAKE_MESSAGE_LOG_LEVEL=STATUS \
     -DFEATURE_system_doubleconversion=OFF \
     -DFEATURE_system_harfbuzz=OFF \
     -DFEATURE_system_jpeg=OFF \

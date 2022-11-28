@@ -24,6 +24,7 @@ cmake ..\qt5\qtbase `
   -DBUILD_SHARED_LIBS=OFF `
   -DCMAKE_BUILD_TYPE=Release `
   -DCMAKE_INSTALL_PREFIX="$env:INSTALL_PREFIX" `
+  -DCMAKE_MESSAGE_LOG_LEVEL=STATUS `
   -DQT_USE_BUNDLED_BundledFreetype=ON `
   -DQT_USE_BUNDLED_BundledHarfbuzz=ON `
   -DQT_USE_BUNDLED_BundledLibpng=ON `
