@@ -3,8 +3,8 @@ name: Release Builds
 on: push
 
 env:
-  QT_VERSION: "v6.4.0"
-  ZLIB_VERSION: "v1.2.12" # not used for msvc builds
+  QT_VERSION: "v6.4.3"
+  ZLIB_VERSION: "v1.2.13" # not used for msvc builds
 
 jobs:
   linux:

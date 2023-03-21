@@ -2,8 +2,11 @@
 
 A minimal static build of Qt:
 
-- Qt version: [Qt 6.3](https://doc.qt.io/qt-6/)
+- Qt version: [Qt 6](https://doc.qt.io/qt-6/)
 - Qt license: [LGPLv3](https://doc.qt.io/qt-6/lgpl.html)
+
+A static build of [zlib](https://github.com/madler/zlib.git) is now also included
+and used instead of the bundled Qt version (does not apply to msvc builds)
 
 Get the latest versions here:
 
