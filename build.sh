@@ -44,14 +44,15 @@ cd ../../
 git clone https://code.qt.io/qt/qt5.git
 cd qt5
 git checkout $QT_VERSION
-# only need qtbase submodule
-git submodule update --init qtbase
+# get qtbase & qt3d submodules
+git submodule update --init --recursive qtbase qt3d
 cd ..
 
-# make build dir in qt/build and run cmake
+# make build dir outside qt5 source dir and run cmake
 mkdir build
 cd build
-cmake ../qt5/qtbase -G "Ninja" \
+cmake ../qt5 -G "Ninja" \
+    -DQT_BUILD_SUBMODULES="qtbase;qt3d" \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
