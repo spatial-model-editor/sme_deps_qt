@@ -5,6 +5,7 @@ set -e -x
 echo "QT_VERSION = $QT_VERSION"
 echo "ZLIB_VERSION: ${ZLIB_VERSION}"
 echo "INSTALL_PREFIX = $INSTALL_PREFIX"
+echo "MACOSX_DEPLOYMENT_TARGET = $MACOSX_DEPLOYMENT_TARGET"
 echo "SUDO_CMD = $SUDO_CMD"
 echo "CONFIGURE_EXTRAS = $CONFIGURE_EXTRAS"
 echo "OS=$OS"
@@ -22,7 +23,7 @@ cd zlib
 mkdir build
 cd build
 cmake -G "Ninja" .. \
-    -DCMAKE_OSX_DEPLOYMENT_TARGET="10.14" \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET" \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
