@@ -2,6 +2,12 @@
 
 set -e -x
 
+export PATH="/usr/local/opt/llvm/bin:$PATH"
+export LDFLAGS="-L/usr/local/opt/llvm/lib"
+export CPPFLAGS="-I/usr/local/opt/llvm/include"
+
+ls /usr/local/opt/llvm/lib/
+
 echo "QT_VERSION = $QT_VERSION"
 echo "ZLIB_VERSION: ${ZLIB_VERSION}"
 echo "INSTALL_PREFIX = $INSTALL_PREFIX"
@@ -10,8 +16,8 @@ echo "SUDO_CMD = $SUDO_CMD"
 echo "CONFIGURE_EXTRAS = $CONFIGURE_EXTRAS"
 echo "OS=$OS"
 echo "PATH=$PATH"
-which g++
-g++ --version
+which clang++
+clang++ --version
 # make qt dir
 mkdir qt
 cd qt
@@ -28,6 +34,8 @@ cmake -G "Ninja" .. \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
     -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+    -DCMAKE_EXE_LINKER_FLAGS="-L/usr/local/opt/llvm/lib/c++ -Wl,-rpath,/usr/local/opt/llvm/lib/c++" \
+    -DCMAKE_STATIC_LINKER_FLAGS="-L/usr/local/opt/llvm/lib/c++ -Wl,-rpath,/usr/local/opt/llvm/lib/c++" \
     -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX"
 time ninja zlibstatic
 # manual install to avoid shared libs being installed & issues with compiling example programs
@@ -54,6 +62,8 @@ mkdir build
 cd build
 cmake ../qt5/qtbase -G "Ninja" \
     -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_EXE_LINKER_FLAGS="-L/usr/local/opt/llvm/lib/c++ -Wl,-rpath,/usr/local/opt/llvm/lib/c++" \
+    -DCMAKE_STATIC_LINKER_FLAGS="-L/usr/local/opt/llvm/lib/c++ -Wl,-rpath,/usr/local/opt/llvm/lib/c++" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
     -DCMAKE_MESSAGE_LOG_LEVEL=STATUS \

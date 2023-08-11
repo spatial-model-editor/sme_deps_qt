@@ -7,41 +7,41 @@ env:
   ZLIB_VERSION: "v1.2.13" # not used for msvc builds
 
 jobs:
-  linux:
-    name: Linux
-    runs-on: ubuntu-20.04
-    env:
-      INSTALL_PREFIX: "/opt/smelibs"
-      SUDO_CMD: "sudo"
-      # legacy opengl option prevents qt from depending on libOpenGL: https://bugreports.qt.io/browse/QTBUG-89754
-      CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF -DOpenGL_GL_PREFERENCE=LEGACY"
-      OS: "linux"
-      CC: "clang"
-      CXX: "clang++"
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Add llvm repo for clang 16
-        run: |
-          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-16 main"
-      - name: Install Qt build dependencies
-        run: |
-          sudo apt update -yy
-          sudo apt install -yy clang-16 libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
-      - name: Set clang version
-        run: |
-          sudo update-alternatives --remove-all clang || echo "nothing to remove"
-          sudo update-alternatives --remove-all clang++ || echo "nothing to remove"
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
-      - uses: actions/checkout@v3
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./artefacts/*
+  # linux:
+  #   name: Linux
+  #   runs-on: ubuntu-20.04
+  #   env:
+  #     INSTALL_PREFIX: "/opt/smelibs"
+  #     SUDO_CMD: "sudo"
+  #     # legacy opengl option prevents qt from depending on libOpenGL: https://bugreports.qt.io/browse/QTBUG-89754
+  #     CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF -DOpenGL_GL_PREFERENCE=LEGACY"
+  #     OS: "linux"
+  #     CC: "clang"
+  #     CXX: "clang++"
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #   steps:
+  #     - name: Add llvm repo for clang 16
+  #       run: |
+  #         sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+  #         sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-16 main"
+  #     - name: Install Qt build dependencies
+  #       run: |
+  #         sudo apt update -yy
+  #         sudo apt install -yy clang-16 libglu1-mesa-dev ninja-build libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
+  #     - name: Set clang version
+  #       run: |
+  #         sudo update-alternatives --remove-all clang || echo "nothing to remove"
+  #         sudo update-alternatives --remove-all clang++ || echo "nothing to remove"
+  #         sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100
+  #         sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
+  #     - uses: actions/checkout@v3
+  #     - name: Build script
+  #       run: ./build.sh
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: ./artefacts/*
 
   macos:
     name: MacOS
@@ -52,14 +52,18 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: "11.0"
       CONFIGURE_EXTRAS: ""
       OS: "osx"
-      CXX: "g++-13"
-      CC: "gcc-13"
+      CXX: "clang++-16"
+      CC: "clang-16"
     defaults:
       run:
         shell: bash
     steps:
-      - name: Brew install ninja / gcc13
-        run: brew install ninja gcc@13
+      - name: Brew install ninja / clang
+        run: brew install ninja llvm@16
+      - run: |
+          echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> /Users/runner/.bash_profile
+          export LDFLAGS="-L/usr/local/opt/llvm/lib"
+          export CPPFLAGS="-I/usr/local/opt/llvm/include"
       - uses: actions/checkout@v3
       - name: Build script
         run: ./build.sh
@@ -67,105 +71,105 @@ jobs:
         with:
           path: ./artefacts/*
 
-  win64-mingw:
-    name: Windows 64-bit Mingw
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: "/c/smelibs"
-      SUDO_CMD: ""
-      CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
-      OS: "win64-mingw"
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja git
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./artefacts/*
+  # win64-mingw:
+  #   name: Windows 64-bit Mingw
+  #   runs-on: windows-2022
+  #   env:
+  #     INSTALL_PREFIX: "/c/smelibs"
+  #     SUDO_CMD: ""
+  #     CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
+  #     OS: "win64-mingw"
+  #   defaults:
+  #     run:
+  #       shell: msys2 {0}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: msys2/setup-msys2@v2
+  #       with:
+  #         msystem: MINGW64
+  #         update: true
+  #         install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja git
+  #     - name: Build script
+  #       run: ./build.sh
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: ./artefacts/*
 
-  win32-mingw:
-    name: Windows 32-bit Mingw
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: "/c/smelibs"
-      SUDO_CMD: ""
-      CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
-      OS: "win32-mingw"
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW32
-          update: true
-          install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-ninja git
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./artefacts/*
+  # win32-mingw:
+  #   name: Windows 32-bit Mingw
+  #   runs-on: windows-2022
+  #   env:
+  #     INSTALL_PREFIX: "/c/smelibs"
+  #     SUDO_CMD: ""
+  #     CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
+  #     OS: "win32-mingw"
+  #   defaults:
+  #     run:
+  #       shell: msys2 {0}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: msys2/setup-msys2@v2
+  #       with:
+  #         msystem: MINGW32
+  #         update: true
+  #         install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-ninja git
+  #     - name: Build script
+  #       run: ./build.sh
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: ./artefacts/*
 
-  win64-msvc:
-    name: Windows 64-bit MSVC
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: 'C:\smelibs'
-      OS: "win64-msvc"
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64
-          toolset: 14.0
-      - name: Build script
-        run: ./build.ps1
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./artefacts/*
+  # win64-msvc:
+  #   name: Windows 64-bit MSVC
+  #   runs-on: windows-2022
+  #   env:
+  #     INSTALL_PREFIX: 'C:\smelibs'
+  #     OS: "win64-msvc"
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ilammy/msvc-dev-cmd@v1
+  #       with:
+  #         arch: amd64
+  #         toolset: 14.0
+  #     - name: Build script
+  #       run: ./build.ps1
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: ./artefacts/*
 
-  win32-msvc:
-    name: Windows 32-bit MSVC
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: 'C:\smelibs'
-      OS: "win32-msvc"
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_x86
-          toolset: 14.0
-      - name: Build script
-        run: ./build.ps1
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./artefacts/*
+  # win32-msvc:
+  #   name: Windows 32-bit MSVC
+  #   runs-on: windows-2022
+  #   env:
+  #     INSTALL_PREFIX: 'C:\smelibs'
+  #     OS: "win32-msvc"
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ilammy/msvc-dev-cmd@v1
+  #       with:
+  #         arch: amd64_x86
+  #         toolset: 14.0
+  #     - name: Build script
+  #       run: ./build.ps1
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: ./artefacts/*
 
-  release:
-    needs: [linux, macos, win64-mingw, win32-mingw, win64-msvc, win32-msvc]
-    runs-on: ubuntu-latest
-    # upload binaries to github release if commit is tagged
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: artifact
-          path: binaries
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: binaries/*
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
+  # release:
+  #   needs: [linux, macos, win64-mingw, win32-mingw, win64-msvc, win32-msvc]
+  #   runs-on: ubuntu-latest
+  #   # upload binaries to github release if commit is tagged
+  #   if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+  #   steps:
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: artifact
+  #         path: binaries
+  #     - name: Upload binaries to release
+  #       uses: svenstaro/upload-release-action@v2
+  #       with:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
+  #         file: binaries/*
+  #         tag: ${{ github.ref }}
+  #         overwrite: true
+  #         file_glob: true
