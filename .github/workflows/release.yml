@@ -52,12 +52,14 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: "11.0"
       CONFIGURE_EXTRAS: ""
       OS: "osx"
+      CXX: "g++-13"
+      CC: "gcc-13"
     defaults:
       run:
         shell: bash
     steps:
-      - name: Brew install ninja
-        run: brew install ninja
+      - name: Brew install ninja / gcc13
+        run: brew install ninja gcc@13
       - uses: actions/checkout@v3
       - name: Build script
         run: ./build.sh
