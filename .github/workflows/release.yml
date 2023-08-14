@@ -52,8 +52,8 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: "11.0"
       CONFIGURE_EXTRAS: ""
       OS: "osx"
-      CXX: "clang++-16"
-      CC: "clang-16"
+      # CXX: "clang++-16"
+      # CC: "clang-16"
     defaults:
       run:
         shell: bash
