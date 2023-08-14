@@ -90,6 +90,8 @@ cd ../..
 
 $INSTALL_PREFIX/bin/qmake -v
 
+otool -L $INSTALL_PREFIX/bin/qmake
+
 # make tarball of installation
 mkdir artefacts
 cd artefacts
