@@ -60,7 +60,7 @@ mkdir build
 cd build
 cmake ../qt5/qtbase -G "Ninja" \
     -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_CXX_FLAGS="-L/usr/local/opt/llvm/lib/c++ -Wl,-rpath,/usr/local/opt/llvm/lib/c++" \
+    -DCMAKE_CXX_FLAGS="-L/usr/local/opt/llvm/lib/c++ -static-libstdc++" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
     -DCMAKE_MESSAGE_LOG_LEVEL=STATUS \
