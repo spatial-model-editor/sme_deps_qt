@@ -155,6 +155,8 @@ jobs:
   release:
     needs: [linux, macos, win64-mingw, win32-mingw, win64-msvc, win32-msvc]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # upload binaries to github release if commit is tagged
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
     steps:
