@@ -7,32 +7,25 @@ env:
   ZLIB_VERSION: "v1.3.1" # not used for msvc builds
 
 jobs:
-  linux:
-    name: Linux
-    runs-on: ubuntu-20.04
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "ubuntu-20.04"
+            shell: "bash"
+            CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF"
+          - os: "macos-13"
+            shell: "bash"
+          - os: "windows-2022"
+            shell: "msys2 {0}"
+            CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     env:
-      CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF"
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: spatial-model-editor/setup-ci@v1
-        with:
-          extra-deps: "libglu1-mesa-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'"
-      - uses: actions/checkout@v4
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-linux
-          path: ./artefacts/*
-
-  macos:
-    name: MacOS
-    runs-on: macos-13
-    defaults:
-      run:
-        shell: bash
+      CONFIGURE_EXTRAS: ${{ matrix.CONFIGURE_EXTRAS }}
     steps:
       - uses: spatial-model-editor/setup-ci@v1
       - uses: actions/checkout@v4
@@ -40,26 +33,9 @@ jobs:
         run: ./build.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: artifacts-macos
+          name: artifacts-${{ matrix.os }}
           path: ./artefacts/*
-
-  win64-mingw:
-    name: Windows 64-bit Mingw
-    runs-on: windows-2022
-    env:
-      CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-      - uses: spatial-model-editor/setup-ci@v1
-      - uses: actions/checkout@v4
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-win64-mingw
-          path: ./artefacts/*
+          retention-days: 3
 
   win32-mingw:
     name: Windows 32-bit Mingw
@@ -81,7 +57,7 @@ jobs:
           install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-ninja git
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: artifacts-win32-mingw
           path: ./artefacts/*
@@ -100,7 +76,7 @@ jobs:
           toolset: 14.0
       - name: Build script
         run: ./build.ps1
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: artifacts-win64-msvc
           path: ./artefacts/*
@@ -119,13 +95,13 @@ jobs:
           toolset: 14.0
       - name: Build script
         run: ./build.ps1
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: artifacts-win32-msvc
           path: ./artefacts/*
 
   release:
-    needs: [linux, macos, win64-mingw, win32-mingw, win64-msvc, win32-msvc]
+    needs: [build, win32-mingw, win64-msvc, win32-msvc]
     runs-on: ubuntu-latest
     permissions:
       contents: write
