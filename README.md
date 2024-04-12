@@ -12,7 +12,6 @@ Get the latest versions here:
 
 - linux (clang 18 / Ubuntu 20.04): [sme_deps_qt_linux.tgz](https://github.com/spatial-model-editor/sme_deps_qt/releases/latest/download/sme_deps_qt_linux.tgz)
 - osx (Xcode 14.3 / macOS 13 / MACOSX_DEPLOYMENT_TARGET 11): [sme_deps_qt_osx.tgz](https://github.com/spatial-model-editor/sme_deps_qt/releases/latest/download/sme_deps_qt_osx.tgz)
-- win32-mingw (mingw-w64-i686-gcc 13): [sme_deps_qt_win32-mingw.tgz](https://github.com/spatial-model-editor/sme_deps_qt/releases/latest/download/sme_deps_qt_win32-mingw.tgz)
 - win64-mingw (mingw-w64-x86_64-gcc 13): [sme_deps_qt_win64-mingw.tgz](https://github.com/spatial-model-editor/sme_deps_qt/releases/latest/download/sme_deps_qt_win64-mingw.tgz)
 - win32-msvc (VC++ 2015 Toolset): [sme_deps_qt_win32-msvc.tgz](https://github.com/spatial-model-editor/sme_deps_qt/releases/latest/download/sme_deps_qt_win32-msvc.tgz)
 - win64-msvc (VC++ 2015 Toolset): [sme_deps_qt_win64-msvc.tgz](https://github.com/spatial-model-editor/sme_deps_qt/releases/latest/download/sme_deps_qt_win64-msvc.tgz)

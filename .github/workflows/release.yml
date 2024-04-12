@@ -9,6 +9,8 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -29,95 +31,45 @@ jobs:
     steps:
       - uses: spatial-model-editor/setup-ci@v1
       - uses: actions/checkout@v4
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-${{ matrix.os }}
-          path: ./artefacts/*
-          retention-days: 3
-
-  win32-mingw:
-    name: Windows 32-bit Mingw
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: "/c/smelibs"
-      SUDO_CMD: ""
-      CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
-      OS: "win32-mingw"
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW32
-          update: true
-          install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-ninja git
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-win32-mingw
-          path: ./artefacts/*
-
-  win64-msvc:
-    name: Windows 64-bit MSVC
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: 'C:\smelibs'
-      OS: "win64-msvc"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64
-          toolset: 14.0
-      - name: Build script
-        run: ./build.ps1
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-win64-msvc
-          path: ./artefacts/*
-
-  win32-msvc:
-    name: Windows 32-bit MSVC
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: 'C:\smelibs'
-      OS: "win32-msvc"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_x86
-          toolset: 14.0
-      - name: Build script
-        run: ./build.ps1
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-win32-msvc
-          path: ./artefacts/*
-
-  release:
-    needs: [build, win32-mingw, win64-msvc, win32-msvc]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    # upload binaries to github release if commit is tagged
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: artifacts-*
-          merge-multiple: true
-          path: binaries
-      - name: Upload binaries to release
+      - run: ./build.sh
+      - name: Upload binaries to release if commit is tagged
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: binaries/*
+          file: ./artefacts/*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+
+  msvc:
+    runs-on: windows-2022
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "win64-msvc"
+            arch: "amd64"
+          - os: "win32-msvc"
+            arch: "amd64_x86"
+    env:
+      INSTALL_PREFIX: 'C:\smelibs'
+      OS: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+          toolset: 14.0
+      - run: ./build.ps1
+      - name: Upload binaries to release if commit is tagged
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./artefacts/*
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
