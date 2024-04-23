@@ -20,6 +20,8 @@ jobs:
             CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF"
           - os: "macos-13"
             shell: "bash"
+          - os: "macos-14"
+            shell: "bash"
           - os: "windows-2022"
             shell: "msys2 {0}"
             CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
