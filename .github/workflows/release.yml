@@ -1,11 +1,8 @@
 name: Release Builds
-
 on: push
-
 env:
   QT_VERSION: "v6.7.0"
   ZLIB_VERSION: "v1.3.1" # not used for msvc builds
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -43,7 +40,6 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
-
   msvc:
     runs-on: windows-2022
     permissions:

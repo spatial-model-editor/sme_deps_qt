@@ -41,7 +41,6 @@ $SUDO_CMD cp zconf.h $INSTALL_PREFIX/include/.
 $SUDO_CMD cp ../zlib.h $INSTALL_PREFIX/include/.
 cd ../../
 
-
 # download Qt sources to qt/qt5
 git clone https://code.qt.io/qt/qt5.git
 cd qt5
