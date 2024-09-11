@@ -1,8 +1,11 @@
 name: Release Builds
 on: push
 env:
-  QT_VERSION: "v6.7.0"
+  QT_VERSION: "v6.7.2"
   ZLIB_VERSION: "v1.3.1" # not used for msvc builds
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ${{ matrix.os }}
