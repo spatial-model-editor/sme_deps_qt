@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: end-of-file-fixer
         exclude: '.*\.diff$'
@@ -11,7 +11,7 @@ repos:
       - id: mixed-line-ending
         exclude: '.*\.diff$'
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.1
+    rev: v1.7.3
     hooks:
       - id: actionlint
   - repo: https://github.com/pecigonzalo/pre-commit-shfmt
