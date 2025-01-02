@@ -11,7 +11,7 @@ repos:
       - id: mixed-line-ending
         exclude: '.*\.diff$'
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.3
+    rev: v1.7.5
     hooks:
       - id: actionlint
   - repo: https://github.com/pecigonzalo/pre-commit-shfmt
@@ -19,7 +19,7 @@ repos:
     hooks:
       - id: shell-fmt-go
   - repo: https://github.com/google/yamlfmt
-    rev: v0.13.0
+    rev: v0.14.0
     hooks:
       - id: yamlfmt
 ci:

@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  QT_VERSION: "v6.7.2"
+  QT_VERSION: "v6.8.1"
   ZLIB_VERSION: "v1.3.1" # not used for msvc builds
 concurrency:
   group: release-${{ github.ref }}
@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "ubuntu-20.04"
+          - os: "ubuntu-22.04"
             shell: "bash"
             CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF"
           - os: "macos-13"
@@ -31,7 +31,7 @@ jobs:
     env:
       CONFIGURE_EXTRAS: ${{ matrix.CONFIGURE_EXTRAS }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2024.04.23
+      - uses: spatial-model-editor/setup-ci@2025.01.02
       - uses: actions/checkout@v4
       - run: ./build.sh
       - name: Upload binaries to release if commit is tagged
