@@ -18,6 +18,8 @@ jobs:
           - os: "ubuntu-22.04"
             shell: "bash"
             CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF"
+          - os: "ubuntu-22.04-arm"
+            shell: "bash"
           - os: "macos-13"
             shell: "bash"
           - os: "macos-14"
@@ -31,7 +33,7 @@ jobs:
     env:
       CONFIGURE_EXTRAS: ${{ matrix.CONFIGURE_EXTRAS }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2025.01.02
+      - uses: spatial-model-editor/setup-ci@2025.01.30
       - uses: actions/checkout@v4
       - run: ./build.sh
       - name: Upload binaries to release if commit is tagged
