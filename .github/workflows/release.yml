@@ -33,7 +33,7 @@ jobs:
     env:
       CONFIGURE_EXTRAS: ${{ matrix.CONFIGURE_EXTRAS }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2025.01.30
+      - uses: spatial-model-editor/setup-ci@2025.02.03
       - uses: actions/checkout@v4
       - run: ./build.sh
       - name: Upload binaries to release if commit is tagged
