@@ -27,13 +27,15 @@ jobs:
           - os: "windows-2022"
             shell: "msys2 {0}"
             CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
+          - os: "windows-11-arm"
+            shell: "msys2 {0}"
     defaults:
       run:
         shell: ${{ matrix.shell }}
     env:
       CONFIGURE_EXTRAS: ${{ matrix.CONFIGURE_EXTRAS }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2025.02.03
+      - uses: spatial-model-editor/setup-ci@2025.05.09
       - uses: actions/checkout@v4
       - run: ./build.sh
       - name: Upload binaries to release if commit is tagged
