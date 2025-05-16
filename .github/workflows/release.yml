@@ -30,7 +30,7 @@ jobs:
           - os: "windows-11-arm"
             shell: "msys2 {0}"
             # disable WrapRt now to avoid linking it and then getting "Could NOT find WrapRt" error when compiling qtcustomplot in sme_deps_common:
-            CONFIGURE_EXTRAS: "-DCMAKE_DISABLE_FIND_PACKAGE_RT=true"
+            # CONFIGURE_EXTRAS: "-DCMAKE_DISABLE_FIND_PACKAGE_RT=true"
     defaults:
       run:
         shell: ${{ matrix.shell }}
