@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  QT_VERSION: "v6.9.0"
+  QT_VERSION: "v6.9.1"
   ZLIB_VERSION: "v1.3.1" # not used for msvc builds
 concurrency:
   group: release-${{ github.ref }}
