@@ -8,6 +8,7 @@ echo "INSTALL_PREFIX = $INSTALL_PREFIX"
 echo "MACOSX_DEPLOYMENT_TARGET = $MACOSX_DEPLOYMENT_TARGET"
 echo "SUDO_CMD = $SUDO_CMD"
 echo "CONFIGURE_EXTRAS = $CONFIGURE_EXTRAS"
+echo "BUILD_TAG = $BUILD_TAG"
 echo "OS=$OS"
 echo "PATH=$PATH"
 which g++
@@ -91,4 +92,4 @@ $INSTALL_PREFIX/bin/qmake -v
 # make tarball of installation
 mkdir artefacts
 cd artefacts
-tar -zcvf sme_deps_qt_${OS}.tgz ${INSTALL_PREFIX}/*
+tar -zcvf sme_deps_qt_${OS}${BUILD_TAG}.tgz ${INSTALL_PREFIX}/*
