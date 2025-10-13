@@ -56,8 +56,8 @@ cd build
 cmake ../qt5/qtbase -G "Ninja" \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-    -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_CXX_VISIBILITY_PRESET=hidden \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
     -DCMAKE_MESSAGE_LOG_LEVEL=STATUS \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
@@ -80,7 +80,7 @@ cmake ../qt5/qtbase -G "Ninja" \
     -DBUILD_WITH_PCH=OFF \
     ${CONFIGURE_EXTRAS}
 
-time ninja
+time ninja -v
 $SUDO_CMD ninja install
 
 cd ../..
