@@ -43,6 +43,8 @@ jobs:
       BUILD_TAG: ${{ matrix.BUILD_TAG }}
     steps:
       - uses: spatial-model-editor/setup-ci@2025.05.09
+        with:
+          cache_id: ${{ matrix.BUILD_TAG }}
       - uses: actions/checkout@v4
       - run: ./build.sh
       - name: Upload binaries to release if commit is tagged
