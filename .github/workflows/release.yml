@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  QT_VERSION: "v6.9.2"
+  QT_VERSION: "v6.10.2"
   ZLIB_VERSION: "v1.3.1" # not used for msvc builds
 concurrency:
   group: release-${{ github.ref }}
@@ -24,8 +24,6 @@ jobs:
             BUILD_TAG: "_tsan"
           - os: "ubuntu-22.04-arm"
             shell: "bash"
-          - os: "macos-13"
-            shell: "bash"
           - os: "macos-14"
             shell: "bash"
           - os: "windows-2022"
@@ -42,10 +40,10 @@ jobs:
       CONFIGURE_EXTRAS: ${{ matrix.CONFIGURE_EXTRAS }}
       BUILD_TAG: ${{ matrix.BUILD_TAG }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2025.05.09
+      - uses: spatial-model-editor/setup-ci@2026.03.23
         with:
           cache_id: ${{ matrix.BUILD_TAG }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: ./build.sh
       - name: Upload binaries to release if commit is tagged
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
