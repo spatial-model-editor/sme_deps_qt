@@ -2,80 +2,42 @@ name: Release Builds
 on: push
 env:
   QT_VERSION: "v6.10.2"
-  ZLIB_VERSION: "v1.3.1" # not used for msvc builds
+  ZLIB_VERSION: "v1.3.1"
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: write
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: "ubuntu-22.04"
-            shell: "bash"
             CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF"
           - os: "ubuntu-22.04"
-            shell: "bash"
             CONFIGURE_EXTRAS: "-DFEATURE_sanitize_thread=ON -DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF"
             BUILD_TAG: "_tsan"
           - os: "ubuntu-22.04-arm"
-            shell: "bash"
           - os: "macos-14"
-            shell: "bash"
           - os: "windows-2022"
-            shell: "msys2 {0}"
-            CONFIGURE_EXTRAS: "-DQT_QMAKE_TARGET_MKSPEC=win32-g++"
-            # - os: "windows-11-arm"
-            #   shell: "msys2 {0}"
-            #   # disable WrapRt now to avoid linking it and then getting "Could NOT find WrapRt" error when compiling qtcustomplot in sme_deps_common:
-            #   CONFIGURE_EXTRAS: "-DCMAKE_DISABLE_FIND_PACKAGE_RT"
-    defaults:
-      run:
-        shell: ${{ matrix.shell }}
+          - os: "windows-11-arm"
+    permissions:
+      contents: write
     env:
       CONFIGURE_EXTRAS: ${{ matrix.CONFIGURE_EXTRAS }}
       BUILD_TAG: ${{ matrix.BUILD_TAG }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2026.03.23
+      - uses: spatial-model-editor/setup-ci@2026.03.27
         with:
           cache_id: ${{ matrix.BUILD_TAG }}
       - uses: actions/checkout@v6
-      - run: ./build.sh
-      - name: Upload binaries to release if commit is tagged
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./artefacts/*
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
-  msvc:
-    runs-on: windows-2022
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: "win64-msvc"
-            arch: "amd64"
-          - os: "win32-msvc"
-            arch: "amd64_x86"
-    env:
-      INSTALL_PREFIX: 'C:\smelibs'
-      OS: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.arch }}
-          toolset: 14.0
-      - run: ./build.ps1
+      - name: Build script
+        if: runner.os != 'Windows'
+        run: ./build.sh
+      - name: Build script
+        if: runner.os == 'Windows'
+        run: ./build.ps1
       - name: Upload binaries to release if commit is tagged
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2

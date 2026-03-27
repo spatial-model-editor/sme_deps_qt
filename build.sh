@@ -14,14 +14,14 @@ echo "PATH=$PATH"
 which g++
 g++ --version
 # make qt dir
-mkdir qt
+mkdir -p qt
 cd qt
 
 # build static version of zlib to use instead of Qt bundled version
 # to allow other libraries to link to the same zlib version
 git clone -b $ZLIB_VERSION --depth 1 https://github.com/madler/zlib.git
 cd zlib
-mkdir build
+mkdir -p build
 cd build
 cmake -G "Ninja" .. \
     -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET" \
@@ -33,7 +33,7 @@ cmake -G "Ninja" .. \
     -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX"
 time ninja zlibstatic
 # manual install to avoid shared libs being installed & issues with compiling example programs
-# wildcard is used because on mingw it calls the library file libzlibstatic.a for some reason:
+# wildcard handles toolchain-specific static library naming, e.g. libzlibstatic.a:
 $SUDO_CMD mkdir -p $INSTALL_PREFIX
 $SUDO_CMD mkdir -p $INSTALL_PREFIX/lib
 $SUDO_CMD mkdir -p $INSTALL_PREFIX/include
@@ -51,7 +51,7 @@ git submodule update --init qtbase
 cd ..
 
 # make build dir in qt/build and run cmake
-mkdir build
+mkdir -p build
 cd build
 cmake ../qt5/qtbase -G "Ninja" \
     -DCMAKE_BUILD_TYPE=Release \
@@ -90,6 +90,6 @@ ccache --show-stats
 $INSTALL_PREFIX/bin/qmake -v
 
 # make tarball of installation
-mkdir artefacts
+mkdir -p artefacts
 cd artefacts
 tar -zcvf sme_deps_qt_${OS}${BUILD_TAG}.tgz ${INSTALL_PREFIX}/*
