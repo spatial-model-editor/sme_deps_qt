@@ -27,9 +27,9 @@ cmake -G "Ninja" .. \
     -DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET" \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-    -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-    -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_C_VISIBILITY_PRESET=hidden \
     -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX"
 time ninja zlibstatic
 # manual install to avoid shared libs being installed & issues with compiling example programs
@@ -42,18 +42,13 @@ $SUDO_CMD cp zconf.h $INSTALL_PREFIX/include/.
 $SUDO_CMD cp ../zlib.h $INSTALL_PREFIX/include/.
 cd ../../
 
-# download Qt sources to qt/qt5
-git clone https://code.qt.io/qt/qt5.git
-cd qt5
-git checkout $QT_VERSION
-# only need qtbase submodule
-git submodule update --init qtbase
-cd ..
+# download Qt sources to qt/qtbase (only need qtbase)
+git clone -b $QT_VERSION --depth 1 https://code.qt.io/qt/qtbase.git
 
 # make build dir in qt/build and run cmake
 mkdir -p build
 cd build
-cmake ../qt5/qtbase -G "Ninja" \
+cmake ../qtbase -G "Ninja" \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \

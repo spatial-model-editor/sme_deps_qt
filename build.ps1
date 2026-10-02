@@ -45,6 +45,7 @@ Write-Host "CONFIGURE_EXTRAS = $env:CONFIGURE_EXTRAS"
 Write-Host "BUILD_TAG = $buildTag"
 Write-Host "OS = $env:OS"
 Write-Host "CMAKE_MSVC_RUNTIME_LIBRARY = $env:CMAKE_MSVC_RUNTIME_LIBRARY"
+Write-Host "CMAKE_CXX_FLAGS = $env:CMAKE_CXX_FLAGS"
 Write-Host "PATH=$env:PATH"
 Write-Host "git = $((Get-Command git -ErrorAction Stop).Source)"
 git --version
@@ -82,30 +83,26 @@ ninja zlibstatic
 New-Directory $env:INSTALL_PREFIX
 New-Directory $installLibDir
 New-Directory $installIncludeDir
-Copy-Item ".\zlibstatic.lib" (Join-Path $installLibDir "zlibstatic.lib") -Force
+Copy-Item ".\zs.lib" (Join-Path $installLibDir "zs.lib") -Force
 Copy-Item ".\zconf.h" (Join-Path $installIncludeDir "zconf.h") -Force
 Copy-Item "..\zlib.h" (Join-Path $installIncludeDir "zlib.h") -Force
-$zlibLibrary = Join-Path $installLibDir "zlibstatic.lib"
+$zlibLibrary = Join-Path $installLibDir "zs.lib"
 Pop-Location
 Pop-Location
 
-# download Qt sources to qt/qt5
-git clone https://code.qt.io/qt/qt5.git
-Push-Location "qt5"
-git checkout $env:QT_VERSION
-# only need qtbase submodule
-git submodule update --init qtbase
-Pop-Location
+# download Qt sources to qt/qtbase (only need qtbase)
+git clone -b $env:QT_VERSION --depth 1 https://code.qt.io/qt/qtbase.git
 
 # make build dir in qt/build and run cmake
 New-Directory "build"
 Push-Location "build"
 $cmakeArgs = @(
-  "..\qt5\qtbase",
+  "..\qtbase",
   "-GNinja",
   "-DCMAKE_BUILD_TYPE=Release",
   "-DBUILD_SHARED_LIBS=OFF",
   "-DCMAKE_MSVC_RUNTIME_LIBRARY=$env:CMAKE_MSVC_RUNTIME_LIBRARY",
+  "-DCMAKE_CXX_FLAGS=$env:CMAKE_CXX_FLAGS",
   "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
   "-DCMAKE_CXX_VISIBILITY_PRESET=hidden",
   "-DCMAKE_INSTALL_PREFIX=$env:INSTALL_PREFIX",

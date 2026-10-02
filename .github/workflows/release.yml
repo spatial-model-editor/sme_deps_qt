@@ -1,8 +1,8 @@
 name: Release Builds
 on: push
 env:
-  QT_VERSION: "v6.10.2"
-  ZLIB_VERSION: "v1.3.1"
+  QT_VERSION: "v6.12.0"
+  ZLIB_VERSION: "v1.3.2"
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
@@ -19,7 +19,8 @@ jobs:
             CONFIGURE_EXTRAS: "-DFEATURE_sanitize_thread=ON -DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF"
             BUILD_TAG: "_tsan"
           - os: "ubuntu-22.04-arm"
-          - os: "macos-14"
+            CONFIGURE_EXTRAS: "-DFEATURE_xcb=ON -DINPUT_bundled_xcb_xinput=yes -DFEATURE_libudev=OFF"
+          - os: "macos-26"
           - os: "windows-2022"
           - os: "windows-11-arm"
     permissions:
@@ -28,10 +29,10 @@ jobs:
       CONFIGURE_EXTRAS: ${{ matrix.CONFIGURE_EXTRAS }}
       BUILD_TAG: ${{ matrix.BUILD_TAG }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2026.03.27
+      - uses: spatial-model-editor/setup-ci@2026.10.02
         with:
           cache_id: ${{ matrix.BUILD_TAG }}
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Build script
         if: runner.os != 'Windows'
         run: ./build.sh
