@@ -71,6 +71,8 @@ cmake ../qtbase -G "Ninja" \
     -DFEATURE_openssl=OFF \
     -DFEATURE_sql=OFF \
     -DFEATURE_icu=OFF \
+    -DFEATURE_glib=OFF \
+    -DFEATURE_xcb_sm=OFF \
     -DFEATURE_testlib=ON \
     -DBUILD_WITH_PCH=OFF \
     ${CONFIGURE_EXTRAS}
